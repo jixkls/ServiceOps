@@ -2,6 +2,7 @@ require "test_helper"
 
 class ServiceCategoriesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_as(users(:one))
     @service_category = service_categories(:one)
   end
 
