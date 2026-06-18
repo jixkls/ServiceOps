@@ -7,3 +7,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Usuário admin inicial para acessar o painel.
+# Idempotente: roda sem duplicar se o usuário já existir.
+admin_email = "admin@serviceops.local"
+admin_password = ENV.fetch("ADMIN_PASSWORD", "password")
+
+admin = User.find_or_create_by!(email_address: admin_email) do |user|
+  user.password = admin_password
+end
+
+puts "Usuário admin pronto: #{admin.email_address} (senha: #{admin_password})"
