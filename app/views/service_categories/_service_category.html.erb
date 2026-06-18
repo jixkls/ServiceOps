@@ -1,0 +1,14 @@
+<div id="<%= dom_id service_category %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= service_category.name %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= service_category.description %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Active:</strong>
+    <%= service_category.active? ? "Yes" : "No" %>
+  </div>
+</div>
