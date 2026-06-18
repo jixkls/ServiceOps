@@ -49,11 +49,16 @@ class ServiceCategoriesController < ApplicationController
 
   # DELETE /service_categories/1 or /service_categories/1.json
   def destroy
-    @service_category.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to service_categories_path, notice: "Service category was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
+    if @service_category.destroy
+      respond_to do |format|
+        format.html { redirect_to service_categories_path, notice: "Service category was successfully destroyed.", status: :see_other }
+        format.json { head :no_content }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to service_categories_path, alert: @service_category.errors.full_messages.to_sentence, status: :see_other }
+        format.json { render json: @service_category.errors, status: :unprocessable_content }
+      end
     end
   end
 

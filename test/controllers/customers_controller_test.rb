@@ -39,11 +39,22 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to customer_url(@customer)
   end
 
-  test "should destroy customer" do
+  test "should destroy customer without service orders" do
+    customer = customers(:two)
     assert_difference("Customer.count", -1) do
+      delete customer_url(customer)
+    end
+
+    assert_redirected_to customers_url
+  end
+
+  test "should not destroy customer that has service orders" do
+    # customers(:one) está vinculado a ordens de serviço nos fixtures.
+    assert_no_difference("Customer.count") do
       delete customer_url(@customer)
     end
 
     assert_redirected_to customers_url
+    assert_not_nil flash[:alert]
   end
 end

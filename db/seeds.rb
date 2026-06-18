@@ -15,6 +15,10 @@ admin_password = ENV.fetch("ADMIN_PASSWORD", "password")
 
 admin = User.find_or_create_by!(email_address: admin_email) do |user|
   user.password = admin_password
+  user.role = :admin
 end
 
-puts "Usuário admin pronto: #{admin.email_address} (senha: #{admin_password})"
+# Garante o papel de admin mesmo se o usuário já existia antes da coluna role.
+admin.update!(role: :admin) unless admin.admin?
+
+puts "Usuário admin pronto: #{admin.email_address} (role: #{admin.role}, senha: #{admin_password})"
