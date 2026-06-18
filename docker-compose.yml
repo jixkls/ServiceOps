@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: service_ops_postgres
+    environment:
+      POSTGRES_USER: service_ops
+      POSTGRES_PASSWORD: service_ops
+      POSTGRES_DB: service_ops_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
