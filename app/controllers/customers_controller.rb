@@ -49,11 +49,16 @@ class CustomersController < ApplicationController
 
   # DELETE /customers/1 or /customers/1.json
   def destroy
-    @customer.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to customers_path, notice: "Customer was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
+    if @customer.destroy
+      respond_to do |format|
+        format.html { redirect_to customers_path, notice: "Customer was successfully destroyed.", status: :see_other }
+        format.json { head :no_content }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to customers_path, alert: @customer.errors.full_messages.to_sentence, status: :see_other }
+        format.json { render json: @customer.errors, status: :unprocessable_content }
+      end
     end
   end
 

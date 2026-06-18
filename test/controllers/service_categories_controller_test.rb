@@ -2,6 +2,7 @@ require "test_helper"
 
 class ServiceCategoriesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in_as(users(:one))
     @service_category = service_categories(:one)
   end
 
@@ -38,11 +39,22 @@ class ServiceCategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_category_url(@service_category)
   end
 
-  test "should destroy service_category" do
+  test "should destroy service_category without service orders" do
+    service_category = service_categories(:two)
     assert_difference("ServiceCategory.count", -1) do
+      delete service_category_url(service_category)
+    end
+
+    assert_redirected_to service_categories_url
+  end
+
+  test "should not destroy service_category that has service orders" do
+    # service_categories(:one) está vinculado a ordens de serviço nos fixtures.
+    assert_no_difference("ServiceCategory.count") do
       delete service_category_url(@service_category)
     end
 
     assert_redirected_to service_categories_url
+    assert_not_nil flash[:alert]
   end
 end

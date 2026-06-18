@@ -1,0 +1,24 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  code: OS-2026-AAA001
+  customer: one
+  assigned_user: one
+  service_category: one
+  title: Notebook não liga
+  description: Cliente relata que o notebook não dá sinal de vídeo.
+  status: opened
+  priority: normal
+  public_token: token-fixture-one
+  opened_at: 2026-06-18 14:18:57
+
+two:
+  code: OS-2026-BBB002
+  customer: one
+  service_category: one
+  title: Formatação e backup
+  description: Formatar e preservar arquivos da pasta Documentos.
+  status: in_diagnosis
+  priority: high
+  public_token: token-fixture-two
+  opened_at: 2026-06-18 14:18:57

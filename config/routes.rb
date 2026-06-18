@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
   resources :service_categories
   resources :customers
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -12,5 +14,6 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  # Temporário: na Fase 12 (dashboard) isto vira root "dashboard#index".
+  root "customers#index"
 end
