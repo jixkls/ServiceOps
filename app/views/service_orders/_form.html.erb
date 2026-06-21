@@ -1,0 +1,52 @@
+<%= form_with(model: service_order, class: "contents") do |form| %>
+  <% if service_order.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(service_order.errors.count, "error") %> prohibited this service_order from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% service_order.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% field_classes = "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+
+  <div class="my-5">
+    <%= form.label :customer_id, "Cliente" %>
+    <%= form.collection_select :customer_id, Customer.order(:name), :id, :name,
+          { prompt: "Selecione um cliente" }, class: field_classes %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :service_category_id, "Categoria" %>
+    <%= form.collection_select :service_category_id, ServiceCategory.order(:name), :id, :name,
+          { prompt: "Selecione uma categoria" }, class: field_classes %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :assigned_user_id, "Técnico responsável" %>
+    <%= form.collection_select :assigned_user_id, User.order(:email_address), :id, :email_address,
+          { include_blank: "Sem técnico atribuído" }, class: field_classes %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :title, "Título" %>
+    <%= form.text_field :title, class: field_classes %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :description, "Descrição" %>
+    <%= form.textarea :description, rows: 4, class: field_classes %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :priority, "Prioridade" %>
+    <%= form.select :priority, ServiceOrder::PRIORITIES, {}, class: field_classes %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
