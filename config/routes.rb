@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  resources :service_orders
+  resources :service_orders do
+    # Cada ordem tem no máximo um diagnóstico (recurso singular aninhado).
+    resource :diagnostic, only: %i[ new create edit update ]
+  end
   resource :session
   resources :passwords, param: :token
   resources :service_categories

@@ -10,6 +10,11 @@ class User < ApplicationRecord
            dependent: :nullify,
            inverse_of: :assigned_user
 
+  # Diagnósticos técnicos registrados por este usuário.
+  # Fazem parte do histórico da ordem, então não permitimos apagar o usuário
+  # enquanto houver diagnósticos vinculados a ele.
+  has_many :diagnostics, dependent: :restrict_with_error
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   enum :role, {

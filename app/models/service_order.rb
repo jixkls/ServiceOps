@@ -32,6 +32,9 @@ class ServiceOrder < ApplicationRecord
   belongs_to :assigned_user, class_name: "User", optional: true
   belongs_to :service_category
 
+  # Análise técnica da ordem; some junto com a ordem se ela for removida.
+  has_one :diagnostic, dependent: :destroy
+
   before_validation :set_defaults, on: :create
 
   validates :code, :status, :priority, :public_token, presence: true
@@ -39,6 +42,13 @@ class ServiceOrder < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :priority, inclusion: { in: PRIORITIES }
   validate :status_transition_must_be_allowed, on: :update
+
+  # Avança a ordem para "em diagnóstico" quando um diagnóstico é registrado.
+  # Idempotente: só age se a ordem ainda estiver "opened"; em qualquer outro
+  # status (ex.: já em diagnóstico, cancelada) não faz nada.
+  def start_diagnosis!
+    update!(status: "in_diagnosis") if status == "opened"
+  end
 
   private
 

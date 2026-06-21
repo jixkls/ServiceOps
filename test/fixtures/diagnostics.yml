@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# Diagnóstico já existente na ordem :one (exercita a tela de show e a edição).
+# A ordem :two fica sem diagnóstico de propósito, para os testes de criação.
+one:
+  service_order: one
+  user: one
+  summary: Fonte queimada
+  technical_details: Sem tensão na saída da fonte; necessário substituir.
