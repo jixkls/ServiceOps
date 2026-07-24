@@ -1,5 +1,6 @@
 class CustomersController < ApplicationController
   before_action :set_customer, only: %i[ show edit update destroy ]
+  before_action -> { require_role!(:admin, :attendant) }, except: %i[index show]
 
   # GET /customers or /customers.json
   def index

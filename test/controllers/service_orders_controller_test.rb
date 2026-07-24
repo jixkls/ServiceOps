@@ -39,6 +39,34 @@ class ServiceOrdersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to service_order_url(@service_order)
   end
 
+  test "should transition service order and record actor" do
+    assert_difference("StatusHistory.count", 1) do
+      patch transition_service_order_url(@service_order),
+        params: { service_order: { status: "in_diagnosis", note: "Iniciando análise" } }
+    end
+
+    assert_redirected_to service_order_url(@service_order)
+    assert_equal "in_diagnosis", @service_order.reload.status
+    assert_equal users(:one), @service_order.status_histories.last.user
+  end
+
+  test "technician only sees assigned orders" do
+    sign_out
+    sign_in_as(users(:two))
+
+    get service_orders_url
+    assert_response :success
+    assert_select "##{ActionView::RecordIdentifier.dom_id(service_orders(:one))}", count: 0
+  end
+
+  test "technician cannot edit orders" do
+    sign_out
+    sign_in_as(users(:two))
+
+    get edit_service_order_url(@service_order)
+    assert_redirected_to root_url
+  end
+
   test "should destroy service_order" do
     assert_difference("ServiceOrder.count", -1) do
       delete service_order_url(@service_order)

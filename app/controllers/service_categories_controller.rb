@@ -1,5 +1,6 @@
 class ServiceCategoriesController < ApplicationController
   before_action :set_service_category, only: %i[ show edit update destroy ]
+  before_action -> { require_role!(:admin) }, except: %i[index show]
 
   # GET /service_categories or /service_categories.json
   def index

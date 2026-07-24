@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :status_histories, dependent: :nullify
 
   # Ordens em que este usuário é o técnico responsável.
   # Se o usuário for removido, as ordens apenas ficam sem responsável (nullify).
