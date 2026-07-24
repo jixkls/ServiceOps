@@ -47,6 +47,10 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+# Repositories checked out on Windows may copy executable scripts with CRLF
+# endings, which makes Linux resolve the shebang as "ruby\r".
+RUN sed -i 's/\r$//' bin/*
+
 # Precompile bootsnap code for faster boot times.
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/

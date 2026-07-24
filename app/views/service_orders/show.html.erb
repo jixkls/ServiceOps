@@ -1,39 +1,74 @@
-<% content_for :title, "Showing service order" %>
+<% content_for :title, @service_order.code %>
 
-<div class="md:w-2/3 w-full">
+<div class="w-full">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="mb-5 inline-block rounded-md bg-green-50 px-3 py-2 font-medium text-green-700"><%= notice %></p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing service order</h1>
-
-  <%= render @service_order %>
-
-  <div class="my-5 border-t border-gray-200 pt-5">
-    <h2 class="font-bold text-2xl mb-3">Diagnóstico</h2>
-    <% if @service_order.diagnostic.present? %>
-      <div class="space-y-3">
-        <div>
-          <strong class="block font-medium mb-1">Resumo:</strong>
-          <%= @service_order.diagnostic.summary %>
-        </div>
-        <div>
-          <strong class="block font-medium mb-1">Detalhes técnicos:</strong>
-          <%= @service_order.diagnostic.technical_details %>
-        </div>
-        <div>
-          <strong class="block font-medium mb-1">Registrado por:</strong>
-          <%= @service_order.diagnostic.user.email_address %>
-        </div>
-      </div>
-      <%= link_to "Editar diagnóstico", edit_service_order_diagnostic_path(@service_order), class: "w-full sm:w-auto text-center mt-3 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-    <% else %>
-      <p class="text-gray-600 mb-3">Nenhum diagnóstico registrado.</p>
-      <%= link_to "Registrar diagnóstico", new_service_order_diagnostic_path(@service_order), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium" %>
-    <% end %>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wide text-blue-700"><%= @service_order.code %></p>
+      <h1 class="text-3xl font-bold"><%= @service_order.title.presence || "Ordem de serviço" %></h1>
+    </div>
+    <div class="flex gap-2">
+      <% if can_manage_orders? %>
+        <%= link_to "Editar", edit_service_order_path(@service_order), class: "rounded-md bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300" %>
+      <% end %>
+      <%= link_to "Voltar", service_orders_path, class: "rounded-md bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300" %>
+    </div>
   </div>
 
-  <%= link_to "Edit this service order", edit_service_order_path(@service_order), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to service orders", service_orders_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this service order", @service_order, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <section class="space-y-6 lg:col-span-2">
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <%= render @service_order %>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-xl font-bold">Diagnóstico</h2>
+        <% if @service_order.diagnostic.present? %>
+          <p><strong>Resumo:</strong> <%= @service_order.diagnostic.summary %></p>
+          <p class="mt-2"><strong>Detalhes técnicos:</strong> <%= @service_order.diagnostic.technical_details %></p>
+          <p class="mt-2 text-sm text-slate-500">Registrado por <%= @service_order.diagnostic.user.email_address %></p>
+          <%= link_to "Editar diagnóstico", edit_service_order_diagnostic_path(@service_order), class: "mt-4 inline-block rounded-md bg-slate-200 px-4 py-2 font-medium" %>
+        <% else %>
+          <p class="mb-3 text-slate-500">Nenhum diagnóstico registrado.</p>
+          <%= link_to "Registrar diagnóstico", new_service_order_diagnostic_path(@service_order), class: "inline-block rounded-md bg-blue-600 px-4 py-2 font-medium text-white" %>
+        <% end %>
+      </div>
+    </section>
+
+    <aside>
+      <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-xl font-bold">Atualizar status</h2>
+        <% if @service_order.allowed_next_statuses.any? %>
+          <%= form_with url: transition_service_order_path(@service_order), method: :patch, scope: :service_order do |form| %>
+            <%= form.label :status, "Próximo status", class: "block text-sm font-medium" %>
+            <%= form.select :status, @service_order.allowed_next_statuses.map { |status| [status_label(status), status] },
+                  {}, class: "mt-2 w-full rounded-md border border-slate-300 px-3 py-2" %>
+            <%= form.label :note, "Observação", class: "mt-4 block text-sm font-medium" %>
+            <%= form.text_area :note, rows: 3, class: "mt-2 w-full rounded-md border border-slate-300 px-3 py-2" %>
+            <%= form.submit "Atualizar status", class: "mt-4 w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2 font-medium text-white" %>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-slate-500">Esta ordem está em um estado final.</p>
+        <% end %>
+      </section>
+    </aside>
+  </div>
+
+  <section class="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-5 text-xl font-bold">Histórico de status</h2>
+    <ol class="space-y-4">
+      <% @service_order.status_histories.each do |history| %>
+        <li class="border-l-4 border-blue-200 pl-4">
+          <p class="font-semibold">
+            <%= history.from_status.present? ? "#{status_label(history.from_status)} → #{status_label(history.to_status)}" : status_label(history.to_status) %>
+          </p>
+          <p class="text-sm text-slate-500"><%= l(history.created_at, format: :short) %> · <%= history.user&.email_address || "Sistema" %></p>
+          <p class="mt-1 text-sm"><%= history.note %></p>
+        </li>
+      <% end %>
+    </ol>
+  </section>
 </div>

@@ -20,7 +20,7 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   # Conecta no Postgres do Docker Compose (ver docker-compose.yml).
   # Credenciais de desenvolvimento — nao sao segredo. Producao usa ENV (ver abaixo).
-  host: localhost
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
   port: 5432
   username: service_ops
   password: service_ops
