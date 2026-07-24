@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  resources :service_orders
+  resources :service_orders do
+    patch :transition, on: :member
+  end
   resource :session
   resources :passwords, param: :token
   resources :service_categories

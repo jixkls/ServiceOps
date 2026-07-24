@@ -1,15 +1,70 @@
-<% content_for :title, "Showing service order" %>
+<% content_for :title, @service_order.code %>
 
-<div class="md:w-2/3 w-full">
+<div class="w-full">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="mb-5 inline-block rounded-md bg-green-50 px-3 py-2 font-medium text-green-700"><%= notice %></p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing service order</h1>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wide text-blue-700"><%= @service_order.code %></p>
+      <h1 class="text-3xl font-bold"><%= @service_order.title.presence || "Ordem de serviço" %></h1>
+    </div>
+    <div class="flex gap-2">
+      <% if can_manage_orders? %>
+        <%= link_to "Editar", edit_service_order_path(@service_order), class: "rounded-md bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300" %>
+      <% end %>
+      <%= link_to "Voltar", service_orders_path, class: "rounded-md bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300" %>
+    </div>
+  </div>
 
-  <%= render @service_order %>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+      <%= render @service_order %>
+    </section>
 
-  <%= link_to "Edit this service order", edit_service_order_path(@service_order), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to service orders", service_orders_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this service order", @service_order, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <aside class="space-y-6">
+      <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-xl font-bold">Atualizar status</h2>
+        <% if @service_order.allowed_next_statuses.any? %>
+          <%= form_with url: transition_service_order_path(@service_order), method: :patch, scope: :service_order do |form| %>
+            <%= form.label :status, "Próximo status", class: "block text-sm font-medium" %>
+            <%= form.select :status,
+                  @service_order.allowed_next_statuses.map { |status| [status_label(status), status] },
+                  {}, class: "mt-2 w-full rounded-md border border-slate-300 px-3 py-2" %>
+            <%= form.label :note, "Observação", class: "mt-4 block text-sm font-medium" %>
+            <%= form.text_area :note, rows: 3, class: "mt-2 w-full rounded-md border border-slate-300 px-3 py-2",
+                  placeholder: "Explique o motivo da mudança" %>
+            <%= form.submit "Atualizar status", class: "mt-4 w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500" %>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-slate-500">Esta ordem está em um estado final.</p>
+        <% end %>
+      </section>
+    </aside>
+  </div>
+
+  <section class="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-5 text-xl font-bold">Histórico de status</h2>
+    <ol class="space-y-4">
+      <% @service_order.status_histories.each do |history| %>
+        <li class="border-l-4 border-blue-200 pl-4">
+          <p class="font-semibold">
+            <% if history.from_status.present? %>
+              <%= status_label(history.from_status) %> → <%= status_label(history.to_status) %>
+            <% else %>
+              <%= status_label(history.to_status) %>
+            <% end %>
+          </p>
+          <p class="text-sm text-slate-500">
+            <%= l(history.created_at, format: :short) %> ·
+            <%= history.user&.email_address || "Sistema" %>
+          </p>
+          <% if history.note.present? %>
+            <p class="mt-1 text-sm"><%= history.note %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  </section>
 </div>
